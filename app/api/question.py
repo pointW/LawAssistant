@@ -78,7 +78,7 @@ def add_question():
     user_id = json.get('user_id')
     question_draft = json.get('question_draft', 0)
 
-    if user_id is None or user_id == '':
+    if user_id is None or not type(user_id) == int:
         return jsonify({'code': 0, 'msg': 'bad request'})
 
     question = Question(question_detail, user_id, question_draft)

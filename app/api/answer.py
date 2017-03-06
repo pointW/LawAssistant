@@ -54,7 +54,7 @@ def add_answer():
     answer_detail = json.get('answer_detail')
     answer_draft = json.get('answer_draft', 0)
 
-    if not question_id or question_id == '' or not user_id or user_id == '':
+    if not user_id or not type(user_id) == int or not question_id or not type(question_id) == int:
         return json_data(0, 'bad request')
 
     answer = Answer(question_id, user_id, answer_detail, answer_draft)

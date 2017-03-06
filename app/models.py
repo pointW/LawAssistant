@@ -110,19 +110,36 @@ class Collection(db.Model):
         self.user_id = user_id
         self.question_id = question_id
 
+    def to_json(self):
+        json_collection = {
+            'collection_id': self.collection_id,
+            'user_id': self.user_id,
+            'question_id': self.question_id
+        }
+        return json_collection
+
 
 class Comment(db.Model):
     comment_id = db.Column(db.Integer, primary_key=True)
     comment_detail = db.Column(db.String)
-    comment_time = db.Column(db.Time, nullable=False)
+    comment_time = db.Column(db.DateTime, default=datetime.now)
     user_id = db.Column(db.ForeignKey('user.user_id'))
-    question_id = db.column(db.ForeignKey('question.question_id'))
+    question_id = db.Column(db.ForeignKey('question.question_id'))
 
-    def __init__(self, comment_detail, comment_time, user_id, question_id):
+    def __init__(self, comment_detail, user_id, question_id):
         self.comment_detail = comment_detail
-        self.comment_time = comment_time
         self.user_id = user_id
         self.question_id = question_id
+
+    def to_json(self):
+        json_comment = {
+            'comment_id': self.comment_id,
+            'comment_detail': self.comment_detail,
+            'comment_time': self.comment_time,
+            'user_id': self.user_id,
+            'question_id': self.question_id
+        }
+        return json_comment
 
 
 
