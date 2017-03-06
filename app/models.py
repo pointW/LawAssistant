@@ -54,11 +54,25 @@ class User(db.Model):
 class Question(db.Model):
     question_id = db.Column(db.Integer, primary_key=True)
     question_detail = db.Column(db.String)
-    question_time = db.Column(db.Time, nullable=False)
+    question_time = db.Column(db.DateTime, default=datetime.now)
+    user_id = db.Column(db.ForeignKey('user.user_id'))
+    question_draft = db.Column(db.Boolean)
 
-    def __init__(self, question_detail, question_time):
+    def __init__(self, question_detail, user_id, question_draft):
         self.question_detail = question_detail
-        self.question_time = question_time
+        # self.question_time = question_time
+        self.user_id = user_id
+        self.question_draft = question_draft
+
+    def to_json(self):
+        json_question = {
+            'question_id': self.question_id,
+            'question_detail': self.question_detail,
+            'question_time': self.question_time,
+            'user_id': self.user_id,
+            'question_draft': self.question_draft
+        }
+        return json_question
 
 
 class Answer(db.Model):
@@ -66,13 +80,25 @@ class Answer(db.Model):
     question_id = db.Column(db.ForeignKey('question.question_id'))
     user_id = db.Column(db.ForeignKey('user.user_id'))
     answer_detail = db.Column(db.String)
-    answer_time = db.Column(db.Time, nullable=False)
+    answer_time = db.Column(db.DateTime, default=datetime.now)
+    answer_draft = db.Column(db.Boolean)
 
-    def __init__(self, question_id, user_id, answer_detail, answer_time):
+    def __init__(self, question_id, user_id, answer_detail, answer_draft):
         self.question_id = question_id
         self.user_id = user_id
         self.answer_detail = answer_detail
-        self.answer_time = answer_time
+        self.answer_draft = answer_draft
+
+    def to_json(self):
+        json_answer = {
+            'answer_id': self.answer_id,
+            'question_id': self.question_id,
+            'user_id': self.user_id,
+            'answer_detail': self.answer_detail,
+            'answer_time': self.answer_time,
+            'answer_draft': self.answer_draft
+        }
+        return json_answer
 
 
 class Collection(db.Model):
@@ -97,26 +123,6 @@ class Comment(db.Model):
         self.comment_time = comment_time
         self.user_id = user_id
         self.question_id = question_id
-
-
-class AnswerDraft(db.Model):
-    answerDraft_id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey('user.user_id'))
-    answerDraft_detail = db.Column(db.String)
-
-    def __init__(self, user_id, answer_draft_detail):
-        self.user_id = user_id
-        self.answerDraft_detail = answer_draft_detail
-
-
-class QuestionDraft(db.Model):
-    questionDraft_id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey('user.user_id'))
-    questionDraft_detail = db.Column(db.String)
-
-    def __init__(self, user_id, question_draft_detail):
-        self.user_id = user_id
-        self.questionDraft_detail = question_draft_detail
 
 
 
