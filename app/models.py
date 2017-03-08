@@ -10,12 +10,14 @@ class User(db.Model):
     user_password = db.Column(db.String(45), nullable=False)
     user_type = db.Column(db.Integer, nullable=False)
     user_authentication = db.Column(db.String(45))
+    user_nickname = db.Column(db.String(45))
 
-    def __init__(self, user_username, user_password, user_type, user_authentication):
+    def __init__(self, user_username, user_password, user_type, user_authentication, user_nickname):
         self.user_username = user_username
         self.user_password = user_password
         self.user_type = user_type
         self.user_authentication = user_authentication
+        self.user_nickname = user_nickname
 
     def to_json(self):
         json_user = {
@@ -23,7 +25,8 @@ class User(db.Model):
             'user_username': self.user_username,
             'user_password': self.user_password,
             'user_type': self.user_type,
-            'user_authentication': self.user_authentication
+            'user_authentication': self.user_authentication,
+            'user_nickname': self.user_nickname
         }
         return json_user
 
@@ -142,7 +145,38 @@ class Comment(db.Model):
         return json_comment
 
 
+class Click(db.Model):
+    click_id = db.Column(db.Integer, primary_key=True)
+    question_id = db.Column(db.ForeignKey('question.question_id'))
+    click_date = db.Column(db.Date, default=datetime.now().date())
+    click_count = db.Column(db.Integer, default=1)
 
+    def __init__(self, question_id):
+        self.question_id = question_id
+
+
+question_type = db.Table('question_type',
+                         db.Column('question_id', db.Integer, db.ForeignKey('question.question_id')),
+                         db.Column('type_id', db.Integer, db.ForeignKey('type.type_id'))
+                         )
+
+
+class Type(db.Model):
+    type_id = db.Column(db.Integer, primary_key=True)
+    type_name = db.Column(db.String, nullable=False, unique=True)
+
+    questions = db.relationship('Question', secondary=question_type, backref=db.backref('types', lazy='dynamic'))
+
+    # def __init__(self, type_name):
+    #     self.type_name = type_name
+
+    def to_json(self):
+        json_type = {
+            'type_id': self.type_id,
+            'type_name': self.type_name,
+            'questions': [question.to_json() for question in self.questions]
+        }
+        return json_type
 
 
 

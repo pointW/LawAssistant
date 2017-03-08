@@ -1,17 +1,29 @@
 from flask import jsonify, request, current_app, url_for
 from . import api
-from app.models import Question
+from app.models import Question, Click
 from app import db
 from sqlalchemy import and_
 from app.util import json_data
+from datetime import datetime
 
 
 @api.route('/question/<int:id>')
 def get_question(id):
     question = Question.query.get(id)
+
     if question is None:
         return jsonify({'code': 0, 'msg': 'question not exist'})
     else:
+        click = Click.query.filter(and_(Click.question_id == id, Click.click_date == datetime.now().date())).first()
+        if not click:
+            new_click = Click(id)
+            db.session.add(new_click)
+        else:
+            click.click_count += 1
+        try:
+            db.session.commit()
+        except Exception, e:
+            return json_data(0, e.message)
         return jsonify({'code': 1, 'data': question.to_json()})
 
 
